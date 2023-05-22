@@ -3,6 +3,7 @@ package com.challenge.payGoal.controller;
 import com.challenge.payGoal.NotFoundException;
 import com.challenge.payGoal.model.Product;
 import com.challenge.payGoal.repository.ProductRepository;
+import com.challenge.payGoal.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,45 +15,36 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Product createProduct(@RequestBody Product product) {
-        return productRepository.save(product);
+        return productService.createProduct(product);
     }
 
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) throws NotFoundException {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException());
-
-        product.setName(updatedProduct.getName());
-        product.setDescription(updatedProduct.getDescription());
-        product.setPrice(updatedProduct.getPrice());
-        product.setQuantity(updatedProduct.getQuantity());
-
-        return productRepository.save(product);
+    public Product updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
+        return productService.updateProduct(id, updatedProduct);
     }
 
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) throws NotFoundException {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException());
+    public Product getProductById(@PathVariable Long id) {
+        return productService.getProductById(id);
     }
 
     @GetMapping
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productService.getAllProducts();
     }
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
-        productRepository.deleteById(id);
+        productService.deleteProduct(id);
     }
 
     @GetMapping("/sorted-by-price")
     public List<Product> getAllProductsSortedByPrice() {
-        return productRepository.findAllByOrderByPrice();
+        return productService.getAllProductsSortedByPrice();
     }
 }
